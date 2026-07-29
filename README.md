@@ -4,7 +4,7 @@
 
 [![Code of Conduct](https://img.shields.io/badge/%E2%9D%A4-code%20of%20conduct-blue.svg?style=flat)](./CODE_OF_CONDUCT.md)
 
-# {PROJECT_NAME}
+# Airtable Interface Extensions
 
 Description of what the project does and who & where it is used.
 
@@ -28,7 +28,7 @@ This repository falls under [U.S. Digital Response’s Code of Conduct](./CODE_O
 
 This project wouldn’t exist without the hard work of many people. Thanks to the following for all their contributions! Please see [`CONTRIBUTING.md`](./CONTRIBUTING.md) to find out how you can help.
 
-**Lead Maintainer:** [@{YOUR_GITHUB_USERNAME}](https://github.com/{YOUR_GITHUB_USERNAME})
+**Lead Maintainer:** [@kevee](https://github.com/kevee)
 
 **Additional Contributors:**
 
