@@ -1,0 +1,41 @@
+{
+    "name": "@usdr/airtable-interface-testing-fixtures",
+    "version": "0.1.0",
+    "description": "Generate test fixture data for Airtable interface extensions from a real base via the Airtable REST API",
+    "type": "module",
+    "bin": {
+        "airtable-testing-fixtures": "./dist/cli.js"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsup",
+        "types": "tsc",
+        "test": "jest"
+    },
+    "dependencies": {
+        "@inquirer/prompts": "^7.0.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^29.5.14",
+        "@types/node": "^22.0.0",
+        "@usdr/airtable-interface-testing": "*",
+        "babel-jest": "^29.7.0",
+        "@babel/core": "^7.26.0",
+        "@babel/preset-env": "^7.26.0",
+        "@babel/preset-typescript": "^7.26.0",
+        "jest": "^29.7.0",
+        "tsup": "^8.3.0",
+        "typescript": "^5.6.0"
+    },
+    "engines": {
+        "node": ">=20.19"
+    }
+}
