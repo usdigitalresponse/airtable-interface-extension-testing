@@ -9,12 +9,22 @@ name: Release
 on:
   push:
     tags: ['v*']
+  # Called by tag-on-merge.yml right after it creates the tag. A tag pushed
+  # with GITHUB_TOKEN doesn't trigger the `push` event above, so that workflow
+  # invokes this one directly instead.
+  workflow_call:
+    inputs:
+      tag:
+        description: Tag to release (e.g. v0.1.0)
+        required: true
+        type: string
   # Lets you re-run a release by hand against an existing tag.
   workflow_dispatch:
     inputs:
       tag:
         description: Existing tag to release (e.g. v0.1.0)
         required: true
+        type: string
 
 permissions:
   contents: write
@@ -23,10 +33,14 @@ jobs:
   release:
     name: Build, pack, and publish a GitHub Release
     runs-on: ubuntu-latest
+    # `inputs.tag` covers both workflow_call and workflow_dispatch; a plain
+    # tag push falls back to the pushed ref.
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.tag || github.ref }}
+          ref: ${{ inputs.tag || github.ref_name }}
 
       - uses: actions/setup-node@v4
         with:
@@ -38,8 +52,6 @@ jobs:
       # Guard: the tag must match the version both packages declare, so the
       # release name can never disagree with the tarballs attached to it.
       - name: Check package versions match the tag
-        env:
-          TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
           node --input-type=commonjs -e '
             const fs = require("fs");
@@ -76,7 +88,6 @@ jobs:
       - name: Create the GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
           gh release create "$TAG" release/*.tgz \
             --title "$TAG" \

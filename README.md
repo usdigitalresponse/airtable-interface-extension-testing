@@ -55,12 +55,16 @@ A husky pre-commit hook runs `npm run lint` and the test suite before each commi
 
 ## Cutting a release
 
-Releases are automated. Bump the `version` in both `packages/*/package.json` to match the tag you're about to push, then:
+Releasing is a side effect of merging. Bump the `version` in both `packages/*/package.json` as part of your PR, and when it merges to `main` the [tag-on-merge workflow](.github/workflows/tag-on-merge.yml) tags the merge commit with that version and kicks off the release. Merges that don't touch the version do nothing — the tag already exists, so the workflow stops there.
 
 ```bash
-git tag v0.2.0 && git push origin v0.2.0
+npm version 0.2.0 -w @usdr/airtable-interface-testing -w @usdr/airtable-interface-testing-fixtures --no-git-tag-version
 ```
 
-The [release workflow](.github/workflows/release.yml) checks that the tag matches both package versions, runs lint, build, and the full test suite, packs both tarballs, and publishes a GitHub Release with generated notes and the tarballs attached. If the tag and the package versions disagree, it stops before publishing anything.
+That bumps both released packages — and leaves the private example alone — so you can commit the change in your PR and merge.
 
-To build the tarballs locally without releasing — handy for testing an install — run `npm run pack:release` and look in `release/`.
+The [release workflow](.github/workflows/release.yml) then verifies the tag matches both package versions, runs lint, build, and the full test suite, packs both tarballs, and publishes a GitHub Release with generated notes and the tarballs attached. If anything fails, nothing is published.
+
+**Note:** the version in `packages/testing/package.json` is what drives the tag. The root `package.json` is private, stays at `0.0.0`, and is never released.
+
+You can still release by hand — push a `v*` tag yourself, or run the release workflow from the Actions tab against an existing tag. To build the tarballs locally without releasing, run `npm run pack:release` and look in `release/`.

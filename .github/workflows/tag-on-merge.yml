@@ -1,0 +1,60 @@
+name: Tag on merge
+
+# Merging a PR to main tags the merge commit with the version in
+# packages/testing/package.json and releases it. Bump the version in your PR
+# (in both packages/*/package.json) and the release happens on merge; leave
+# the version alone and this is a no-op, so ordinary merges are unaffected.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    name: Tag main when the package version changes
+    runs-on: ubuntu-latest
+    outputs:
+      should-release: ${{ steps.check.outputs.should-release }}
+      tag: ${{ steps.check.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so existing tags are available to check against.
+          fetch-depth: 0
+
+      - name: Decide whether this commit needs a tag
+        id: check
+        run: |
+          VERSION="$(node -p "require('./packages/testing/package.json').version")"
+          TAG="v$VERSION"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "Tag $TAG already exists — the version wasn't bumped, so there is nothing to release."
+            echo "should-release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Version $VERSION has no tag yet — tagging as $TAG."
+            echo "should-release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create and push the tag
+        if: steps.check.outputs.should-release == 'true'
+        env:
+          TAG: ${{ steps.check.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+
+  # Called directly rather than left to the tag push: tags created with
+  # GITHUB_TOKEN don't trigger workflows.
+  release:
+    needs: tag
+    if: needs.tag.outputs.should-release == 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.tag.outputs.tag }}
+    permissions:
+      contents: write
