@@ -4,6 +4,9 @@
 
 [![Code of Conduct](https://img.shields.io/badge/%E2%9D%A4-code%20of%20conduct-blue.svg?style=flat)](./CODE_OF_CONDUCT.md)
 
+> [!WARNING]
+> This repo is still in active development. API changes will happen, new issues are appreciated.
+
 Airtable's [interface extensions](https://airtable.com/developers/interface-extensions) don't include an automated testing feature. Data extensions [do have some support for automated testing](https://airtable.com/developers/extensions/guides/automated-testing), but the interface-alpha SDK reorganized the package so thoroughly that the old library can't even be imported against it. This repo fills that gap.
 
 You get a `TestDriver` with the same shape as the v1 library — fixture data in, a `Container` to render your extension, simulated mutations and permissions, a watch API — rebuilt on the interface-alpha SDK's internals, plus a CLI that generates fixture data from a real base.
