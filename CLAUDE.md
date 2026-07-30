@@ -32,7 +32,7 @@ npm workspaces monorepo:
 ## Commands
 
 - `npm install` — bootstrap all workspaces (re-run after adding a workspace bin; bins only link if their dist file exists).
-- `npm run build` — tsup builds for both packages. Build before running the testing package's dist smoke test or the CLI.
+- `npm run build` — tsup builds both packages **in dependency order**, which the root script spells out explicitly (`-w testing && -w fixture-generator`). Don't switch it back to `--workspaces`: npm runs workspaces in listed/glob order, not topological order, and the fixture generator's declaration build imports `FixtureData` from the testing package's built `dist/index.d.ts`. Building out of order fails with `TS2307: Cannot find module '@usdr/airtable-interface-testing'` — only on clean checkouts (CI), since a stale local `dist/` hides it. Build before running the testing package's dist smoke test or the CLI.
 - `npm test` — every workspace's Jest suite. All suites must pass before committing.
 - `npm run lint` — ESLint over all TypeScript sources (flat config in `eslint.config.mjs`; `.js`/`.cjs`/`.mjs` tool configs and generated `fixtures/` are ignored).
 - **Build before test.** `npm test` requires a prior `npm run build`: the examples workspace resolves the testing package's Jest preset out of `dist/`, and the dist smoke test needs the built artifact. CI (`.github/workflows/ci.yml`) runs lint → build → test in that order on every PR and on pushes to `main`, across Node 20.19 and 22.
@@ -61,6 +61,7 @@ Security rules adapted from [TikiTribe/claude-secure-coding-rules](https://githu
 
 ## Work log
 
+- **2026-07-23** — Fixed the CI build failure: the root `build` script now builds the testing package before the fixture generator explicitly, instead of relying on `--workspaces` ordering (see Commands). Verification lesson: check build exit codes directly — piping the build through `grep -c "Build success"` masked the non-zero status and made a clean-clone check look green.
 - **2026-07-23** — Added `.github/workflows/ci.yml`: on PRs and pushes to `main`, runs `npm ci` → lint → build → test on Node 20.19 and 22, with concurrency cancellation and read-only permissions. Verified the whole sequence from a clean clone. Fixed `dist_smoke.test.tsx`: its `describe.skip` guard didn't work because Jest evaluates a skipped describe's body, so the top-level `require` of `dist/` threw instead of skipping — the require is now lazy inside the test.
 - **2026-07-23** — Added husky (pre-commit: `npm run lint` + `npm test`; commit-msg: commitlint with `@commitlint/config-conventional`) and ESLint (flat config, typescript-eslint, TS-only scope). Fixed the handful of violations it surfaced. New policy recorded above: Claude reports work as ready for review instead of committing.
 - **2026-07-23** — Restructured docs/getting-started.md "Write your first test" into the four-step progressive pattern from Airtable's v1 automated-testing guide (driver from fixture → render → input as user / as host → verify in UI / via watch), absorbing the old "Simulate the environment" section into step 3.

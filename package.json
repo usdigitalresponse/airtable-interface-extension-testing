@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "test": "npm test --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w @usdr/airtable-interface-testing && npm run build -w @usdr/airtable-interface-testing-fixtures",
     "lint": "eslint .",
     "prepare": "husky"
   },
