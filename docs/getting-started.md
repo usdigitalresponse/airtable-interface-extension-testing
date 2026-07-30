@@ -10,11 +10,21 @@ For a live example, check out the [Example extension](../examples/todo-list).
 
 ## Install
 
-After setting up your airtable project, install this package:
+This package isn't on npm yet — we publish tarballs on [GitHub Releases](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases) instead. After setting up your Airtable project, install the latest release:
 
 ```bash
-npm install --save-dev @usdr/airtable-interface-testing
+npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.1.0/usdr-airtable-interface-testing-0.1.0.tgz
 ```
+
+**Finding the URL ---** open the [releases page](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases), pick a release, and look under **Assets**. Copy the link address of `usdr-airtable-interface-testing-<version>.tgz` — that's the URL you pass to `npm install`. The URLs always follow the same pattern, so you can also just edit the version in the command above:
+
+```
+https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v<version>/usdr-airtable-interface-testing-<version>.tgz
+```
+
+npm records the URL in your lockfile, so installs stay reproducible. To upgrade later, install the newer URL the same way.
+
+The testing toolchain (Jest, jsdom, babel, and Testing Library) comes along as dependencies of this package. `@airtable/blocks`, `react`, and `react-dom` are peer dependencies your extension project already has.
 
 ## Configure Jest
 

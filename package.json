@@ -12,6 +12,7 @@
     "test": "npm test --workspaces --if-present",
     "build": "npm run build -w @usdr/airtable-interface-testing && npm run build -w @usdr/airtable-interface-testing-fixtures",
     "lint": "eslint .",
+    "pack:release": "npm run build && node -e \"require('fs').mkdirSync('release',{recursive:true})\" && npm pack -w @usdr/airtable-interface-testing -w @usdr/airtable-interface-testing-fixtures --pack-destination release",
     "prepare": "husky"
   },
   "engines": {
