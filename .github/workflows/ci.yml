@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Cancel superseded runs when a PR is pushed to again.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint, build, and test (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The lower bound is the SDK's minimum (package.json engines); the
+        # upper bound is what we develop against.
+        node-version: ['20.19', '22']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      # Installs from the committed lockfile, so CI matches local installs.
+      - run: npm ci
+
+      - run: npm run lint
+
+      # Must precede the tests: the examples workspace resolves the testing
+      # package's Jest preset out of dist/, and the dist smoke test needs the
+      # built artifact.
+      - run: npm run build
+
+      - run: npm test

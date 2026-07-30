@@ -32,4 +32,6 @@ npm run build
 npm test
 ```
 
-`npm test` runs every workspace in this monorepo.
+`npm test` runs every workspace in this monorepo. Run `npm run build` first — the example workspace loads the testing package's Jest preset from its build output.
+
+A husky pre-commit hook runs `npm run lint` and the test suite before each commit, and commit messages follow [Conventional Commits](https://www.conventionalcommits.org), enforced by commitlint. The same lint, build, and test steps run in GitHub Actions on every pull request, against Node 20.19 and 22.

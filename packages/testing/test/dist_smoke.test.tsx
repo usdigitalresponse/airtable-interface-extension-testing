@@ -13,7 +13,11 @@ const distPath = path.join(__dirname, '..', 'dist', 'index.cjs');
 const describeIfBuilt = fs.existsSync(distPath) ? describe : describe.skip;
 
 describeIfBuilt('built dist artifact', () => {
-    const {TestDriver} = require(distPath);
+    // Required lazily inside the test body: Jest evaluates the callback of a
+    // skipped describe, so a require here would throw instead of skipping.
+    function loadTestDriver() {
+        return require(distPath).TestDriver;
+    }
 
     function List() {
         const base = useBase();
@@ -28,6 +32,7 @@ describeIfBuilt('built dist artifact', () => {
     }
 
     it('renders and mutates through the built TestDriver', async () => {
+        const TestDriver = loadTestDriver();
         const driver = new TestDriver({
             base: {
                 id: 'appDistSmoke00000',
