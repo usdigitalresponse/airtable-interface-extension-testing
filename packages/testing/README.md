@@ -24,8 +24,16 @@ The [example extension's test suite](../../examples/todo-list/test/app.test.tsx)
 
 ## Installation
 
+This package isn't published to npm. Install the tarball from a [GitHub Release](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases):
+
 ```bash
-npm install --save-dev @usdr/airtable-interface-testing @airtable/blocks@interface-alpha-next
+npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.1.0/usdr-airtable-interface-testing-0.1.0.tgz @airtable/blocks@interface-alpha-next
+```
+
+**Finding the URL ---** on the [releases page](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases), open a release and copy the link to `usdr-airtable-interface-testing-<version>.tgz` under **Assets**. Every release follows the same URL shape, so bumping the version in the command above works too:
+
+```
+https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v<version>/usdr-airtable-interface-testing-<version>.tgz
 ```
 
 The toolchain — **Jest**, jsdom, babel, and **Testing Library** — ships as this package's dependencies, so that one install is enough. **React 19** and `react-dom` are peer dependencies your extension project already has.

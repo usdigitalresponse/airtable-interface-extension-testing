@@ -1,0 +1,84 @@
+name: Release
+
+# Publishing happens through GitHub Releases rather than npm: both packages
+# are unpublished, and npm cannot install a workspace subdirectory from a git
+# URL. Pushing a v* tag builds the packages, packs them, and attaches the
+# tarballs to a release consumers can install straight from.
+#
+#   git tag v0.1.0 && git push origin v0.1.0
+on:
+  push:
+    tags: ['v*']
+  # Lets you re-run a release by hand against an existing tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to release (e.g. v0.1.0)
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, pack, and publish a GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      # Guard: the tag must match the version both packages declare, so the
+      # release name can never disagree with the tarballs attached to it.
+      - name: Check package versions match the tag
+        env:
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          node --input-type=commonjs -e '
+            const fs = require("fs");
+            const tag = process.env.TAG.replace(/^v/, "");
+            const packages = [
+              "packages/testing/package.json",
+              "packages/fixture-generator/package.json",
+            ];
+            let failed = false;
+            for (const file of packages) {
+              const {name, version} = JSON.parse(fs.readFileSync(file, "utf8"));
+              if (version !== tag) {
+                console.error(`${name} is at ${version}, but the tag says ${tag}`);
+                failed = true;
+              }
+            }
+            if (failed) {
+              console.error("Bump the package versions to match the tag, or retag.");
+              process.exit(1);
+            }
+            console.log(`Versions match tag ${tag}.`);
+          '
+
+      # The same checks CI runs on pull requests — never ship a red build.
+      - run: npm run lint
+
+      - run: npm run build
+
+      - run: npm test
+
+      # Builds again (cheap) and writes both tarballs to release/.
+      - run: npm run pack:release
+
+      - name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          gh release create "$TAG" release/*.tgz \
+            --title "$TAG" \
+            --generate-notes \
+            --verify-tag

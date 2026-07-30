@@ -32,9 +32,11 @@ npm workspaces monorepo:
 ## Commands
 
 - `npm install` — bootstrap all workspaces (re-run after adding a workspace bin; bins only link if their dist file exists).
-- `npm run build` — tsup builds for both packages. Build before running the testing package's dist smoke test or the CLI.
+- `npm run build` — tsup builds both packages **in dependency order**, which the root script spells out explicitly (`-w testing && -w fixture-generator`). Don't switch it back to `--workspaces`: npm runs workspaces in listed/glob order, not topological order, and the fixture generator's declaration build imports `FixtureData` from the testing package's built `dist/index.d.ts`. Building out of order fails with `TS2307: Cannot find module '@usdr/airtable-interface-testing'` — only on clean checkouts (CI), since a stale local `dist/` hides it. Build before running the testing package's dist smoke test or the CLI.
 - `npm test` — every workspace's Jest suite. All suites must pass before committing.
+- `npm run pack:release` — builds, then packs both tarballs into `release/` (gitignored). Always pack through this script: `npm pack` alone ships whatever stale `dist/` happens to be on disk.
 - `npm run lint` — ESLint over all TypeScript sources (flat config in `eslint.config.mjs`; `.js`/`.cjs`/`.mjs` tool configs and generated `fixtures/` are ignored).
+- **Build before test.** `npm test` requires a prior `npm run build`: the examples workspace resolves the testing package's Jest preset out of `dist/`, and the dist smoke test needs the built artifact. CI (`.github/workflows/ci.yml`) runs lint → build → test in that order on every PR and on pushes to `main`, across Node 20.19 and 22.
 - `npx tsc` inside a workspace — type check (no emit).
 
 ## Architecture invariants (violating these breaks everything)
@@ -51,7 +53,8 @@ npm workspaces monorepo:
 - Pinned/validated SDK build: `@airtable/blocks@interface-alpha-next` = `0.0.0-experimental-dc9f9a979-20260605`. A new experimental build can move internals; the library fails loudly at import if the dist files vanish. Update the README's validated-version note when bumping.
 - The SDK's published ESM uses extensionless relative imports → **only runs under a transforming runner** (Jest+babel validated; Vitest plausible, unvalidated; plain Node impossible). Don't chase plain-Node support.
 - Consumers use the bundled Jest preset (`packages/testing/jest-preset.cjs`, exported as `./jest-preset`): jsdom + inject setupFile + hermetic babel transform allowed to transform the ESM-only SDK + jest-dom. The toolchain (jest, babel, testing-library) ships in the testing package's `dependencies`; react/react-dom/@airtable/blocks stay peers. The examples workspace proves the preset. The testing package's OWN jest config stays hand-rolled because its tests run against `src/` and need `babel-plugin-transform-import-meta`; consumers of the built dist don't.
-- The CLI is unpublished — bins resolve only inside this workspace via `npx`.
+- Neither package is on npm. Distribution is GitHub Release tarballs (`.github/workflows/release.yml`, triggered by `v*` tags), because npm cannot install a workspace subdirectory from a git URL and GitHub Packages would force every consumer to authenticate. Inside this repo the CLI bin resolves via `npx`; elsewhere, install the fixtures tarball.
+- `packages/fixture-generator` keeps `@usdr/airtable-interface-testing` as a **dev**Dependency even though its public `.d.ts` references it: promoting it to a real dependency would make npm try to resolve `@usdr/airtable-interface-testing@*` from the npm registry, where it doesn't exist, breaking installs of the fixtures tarball. Revisit if these are ever published properly.
 - Test base for live checks: `appSvvjTxODMEYhuP` (Tasks table shaped for the example extension).
 
 ## Coding rules
@@ -60,6 +63,9 @@ Security rules adapted from [TikiTribe/claude-secure-coding-rules](https://githu
 
 ## Work log
 
+- **2026-07-23** — Added the release process: root `pack:release` script (build → mkdir → pack both packages into `release/`) and `.github/workflows/release.yml`, which on a `v*` tag verifies the tag matches both package versions, runs lint/build/test, packs, and publishes a GitHub Release with the tarballs attached. Consumer install instructions (release URLs and how to find them) added to the root README, both package READMEs, and docs/getting-started.md; maintainer release steps in the root README.
+- **2026-07-23** — Fixed the CI build failure: the root `build` script now builds the testing package before the fixture generator explicitly, instead of relying on `--workspaces` ordering (see Commands). Verification lesson: check build exit codes directly — piping the build through `grep -c "Build success"` masked the non-zero status and made a clean-clone check look green.
+- **2026-07-23** — Added `.github/workflows/ci.yml`: on PRs and pushes to `main`, runs `npm ci` → lint → build → test on Node 20.19 and 22, with concurrency cancellation and read-only permissions. Verified the whole sequence from a clean clone. Fixed `dist_smoke.test.tsx`: its `describe.skip` guard didn't work because Jest evaluates a skipped describe's body, so the top-level `require` of `dist/` threw instead of skipping — the require is now lazy inside the test.
 - **2026-07-23** — Added husky (pre-commit: `npm run lint` + `npm test`; commit-msg: commitlint with `@commitlint/config-conventional`) and ESLint (flat config, typescript-eslint, TS-only scope). Fixed the handful of violations it surfaced. New policy recorded above: Claude reports work as ready for review instead of committing.
 - **2026-07-23** — Restructured docs/getting-started.md "Write your first test" into the four-step progressive pattern from Airtable's v1 automated-testing guide (driver from fixture → render → input as user / as host → verify in UI / via watch), absorbing the old "Simulate the environment" section into step 3.
 - **2026-07-23** — Token resolution moved to `token.ts` as injectable `resolveTokenAsync` with the no-cache guarantee made explicit and tested: `--token` and `AIRTABLE_TOKEN` are never written to `~/.airtable-testing` (CI use); only interactively entered tokens are cached. Precedence flag > env > cache > prompt. Docs updated.

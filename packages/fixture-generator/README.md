@@ -2,6 +2,14 @@
 
 Generate [`FixtureData`](../testing/README.md#writing-fixture-data) for interface-extension tests from a real Airtable base. This replaces the v1 "Test Fixtures Generator" extension: instead of installing an extension into your base and copy-pasting its output, you run a CLI that reads the base through Airtable's REST APIs and writes a fixture file, letting you choose which tables and fields to export.
 
+## Install
+
+Inside this repo the CLI is already linked, so `npx airtable-testing-fixtures` works from the repo root. From another project, install the tarball attached to a [GitHub Release](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases) — copy the link to `usdr-airtable-interface-testing-fixtures-<version>.tgz` under **Assets**:
+
+```bash
+npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.1.0/usdr-airtable-interface-testing-fixtures-0.1.0.tgz
+```
+
 ## Usage
 
 ```bash

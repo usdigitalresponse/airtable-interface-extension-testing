@@ -6,13 +6,25 @@ This project provides a separate [Jest test environment](https://jestjs.io/docs/
 
 You should be familiar with [Testing Library](https://testing-library.com/) to write your tests.
 
+For a live example, check out the [Example extension](../examples/todo-list).
+
 ## Install
 
-From your extension project:
+This package isn't on npm yet — we publish tarballs on [GitHub Releases](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases) instead. After setting up your Airtable project, install the latest release:
 
 ```bash
-npm install --save-dev @usdr/airtable-interface-testing @airtable/blocks@interface-alpha-next
+npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.1.0/usdr-airtable-interface-testing-0.1.0.tgz
 ```
+
+**Finding the URL ---** open the [releases page](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases), pick a release, and look under **Assets**. Copy the link address of `usdr-airtable-interface-testing-<version>.tgz` — that's the URL you pass to `npm install`. The URLs always follow the same pattern, so you can also just edit the version in the command above:
+
+```
+https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v<version>/usdr-airtable-interface-testing-<version>.tgz
+```
+
+npm records the URL in your lockfile, so installs stay reproducible. To upgrade later, install the newer URL the same way.
+
+The testing toolchain (Jest, jsdom, babel, and Testing Library) comes along as dependencies of this package. `@airtable/blocks`, `react`, and `react-dom` are peer dependencies your extension project already has.
 
 ## Configure Jest
 
@@ -24,13 +36,11 @@ export default {
 };
 ```
 
-The preset supplies everything the environment needs: the jsdom test environment, a setup file that installs the simulated Airtable host before any SDK code runs. No babel config or setup files need to be changed.
-
-Any key you set in your config overrides the preset's, add your own `setupFilesAfterEnv` or narrow `testMatch` as needed.
+Feel free to add any additional Jest configuration values.
 
 ## Structure your extension for testability
 
-You will want to have a separate file that exports your app, so unlike the [Hello World example](https://github.com/Airtable/interface-extensions-hello-world-typescript/blob/main/frontend/index.tsx), export your app as a component, then import it into your app's index file like this:
+You will want to have a separate file that exports your app. Unlike the [Hello World example](https://github.com/Airtable/interface-extensions-hello-world-typescript/blob/main/frontend/index.tsx), you should export your app as a component, then import it into your app's index file like this:
 
 ```tsx
 // src/index.tsx — the only file tests never import
@@ -40,7 +50,7 @@ import { MyApp } from "./app";
 initializeBlock({ interface: () => <MyApp /> });
 ```
 
-This way the Jest test environment can import the app separately and wrap it in it's own simulated Airtable environment.
+This way the test environment can load your app without the default `initializeBlock` wrapper.
 
 ## Generate fixture data
 
@@ -64,22 +74,24 @@ Every test follows the same four-step pattern: create a test driver from fixture
 
 ### 1. Create a test driver with fixture data
 
-Each test starts by instantiating a `TestDriver` with fixture data — a fresh one per test, so no state leaks between tests:
+Each test starts by instantiating a `TestDriver` with fixture data. We suggest saving this as a single file for resuse.
 
 ```tsx
 import TestDriver from "@usdr/airtable-interface-testing";
 import fixtureData from "./fixtures/my-base";
 
 const testDriver = new TestDriver(fixtureData);
+export testDriver
 ```
 
 ### 2. Render the extension
 
-Render your extension's component as a child of the driver's `Container` component. The `Container` provides the simulated Airtable environment the SDK hooks read from:
+Render your extension's component as a child of the driver's `Container` component:
 
 ```tsx
 import { render } from "@testing-library/react";
 import { MyApp } from "../src/app";
+import testDriver from "../test/test-driver";
 
 render(
   <testDriver.Container>
@@ -90,9 +102,9 @@ render(
 
 ### 3. Provide input
 
-You can provide input in two ways.
+You can provide input in two ways: as a user interaction, or simulating a change in the base itself.
 
-**As the user ---** simulate interactions with the rendered UI using `@testing-library/user-event`, which ships with the testing package:
+Simulate interactions with the rendered UI using `@testing-library/user-event`, which ships with the testing package:
 
 ```tsx
 import userEvent from "@testing-library/user-event";
@@ -101,7 +113,7 @@ await userEvent.type(screen.getByLabelText("New task name"), "Water plants");
 await userEvent.click(screen.getByRole("button", { name: "Add task" }));
 ```
 
-**As the host or another collaborator ---** simulate backend behavior with the real SDK models on the driver, or with its `simulate*` methods. Wrap calls made after the initial render in `act(...)` so React processes the resulting re-renders:
+You can also simulate backend behavior with the real SDK models on the driver, or with its `simulate*` methods. Wrap calls made after the initial render in `act(...)` so React processes the resulting re-renders. This is useful to simulate, say, a record is updated by another user.
 
 ```tsx
 import { act } from "@testing-library/react";
@@ -129,11 +141,9 @@ testDriver.simulatePermissionCheck(
 );
 ```
 
-### 4. Verify the expected behavior
+### 4. Verify expected behavior
 
-Verification also comes in two flavors.
-
-**In the UI ---** inspect the rendered output with `@testing-library/react`:
+You can check that changes were made in the UI using `@testing-library/react`:
 
 ```tsx
 import { screen } from "@testing-library/react";
@@ -141,9 +151,9 @@ import { screen } from "@testing-library/react";
 expect(await screen.findByText("Water plants")).toBeInTheDocument();
 ```
 
-**Note:** the first render of a component using `useRecords` suspends while the simulated query loads, so use `await screen.findByText(...)` (not `getByText`) for initial assertions.
+**Note:** the first render of a component using `useRecords` suspends while the simulated query loads, so use `await screen.findByText(...)` and not `getByText`.
 
-**Outside the UI ---** some behaviors don't change the DOM: writing records, expanding a record, registering custom properties. Track those with the driver's [watch API](api.md#events), registering the handler before the input that triggers it:
+Some behaviors don't change the UI: writing records, expanding a record, registering custom properties. Track those with the driver's [watch API](api.md#events), registering the handler before the input that triggers it:
 
 ```tsx
 import { MutationTypes } from "@usdr/airtable-interface-testing";
@@ -190,13 +200,3 @@ test("shows records and creates new ones", async () => {
   expect(mutations[0].type).toBe(MutationTypes.CREATE_MULTIPLE_RECORDS);
 });
 ```
-
-Repeat steps 3 and 4 to exercise each of your extension's features — the [example suite](../examples/todo-list/test/app.test.tsx) has one test per feature, including search params, custom properties, permissions, and record expansion.
-
-## Where to go next
-
-**[API reference](api.md) ---** every `TestDriver` member, the fixture format, watch events, and CLI flags.
-
-**[Example extension](../examples/todo-list) ---** a complete extension and suite exercising every feature; copy it as a starting point.
-
-**[Testing README](../packages/testing/README.md) ---** the v1 → interface parity table and troubleshooting guide.
