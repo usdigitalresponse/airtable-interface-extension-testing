@@ -2,9 +2,9 @@
  * Access to interface-mode SDK modules that ship in `@airtable/blocks`'s
  * `dist/` but are not listed in its `exports` map (only `./base/*`,
  * `./interface/models`, `./interface/ui`, and the base-mode testing utils
- * are). We resolve the package root through `./package.json` (which IS
- * exported) and load the files by absolute path, which bypasses the exports
- * map in every resolver we care about.
+ * are). We locate the package root (see `resolveSdkRoot`) and load the files
+ * by absolute path, which bypasses the exports map in every resolver we care
+ * about.
  *
  * Module identity is preserved in both runtimes that matter:
  * - Under Jest (babel CJS transform), the ambient `require` is Jest's, so
@@ -14,6 +14,7 @@
  * - Under real Node ESM/CJS, `createRequire`'s require(esm) shares Node's ESM
  *   module cache with `import` (Node >= 20.19).
  */
+import * as fs from 'node:fs';
 import {createRequire} from 'node:module';
 import * as path from 'node:path';
 import {type ReactNode} from 'react';
@@ -34,15 +35,48 @@ const nodeRequire = createRequire(
     typeof __filename !== 'undefined' ? __filename : import.meta.url,
 );
 
-let sdkRoot: string;
-try {
-    sdkRoot = path.dirname(nodeRequire.resolve('@airtable/blocks/package.json'));
-} catch {
-    throw spawnError(
-        '@airtable/blocks could not be resolved. Install the interface-alpha ' +
-            'build of the SDK, e.g. `npm install --save-dev @airtable/blocks@interface-alpha-next`.',
-    );
+/**
+ * Locate the installed SDK package directory.
+ *
+ * The `interface-alpha-next` build exports `./package.json`, which makes this
+ * a one-liner. The `interface-alpha` build does not, so fall back to an entry
+ * point both builds export and walk up to the directory that owns it.
+ */
+function resolveSdkRoot(): string {
+    try {
+        return path.dirname(nodeRequire.resolve('@airtable/blocks/package.json'));
+    } catch {
+        // Falls through to the entry-point strategy below.
+    }
+
+    let entryPath: string;
+    try {
+        entryPath = nodeRequire.resolve('@airtable/blocks/interface/ui');
+    } catch {
+        throw spawnError(
+            '@airtable/blocks could not be resolved. Install an interface-alpha ' +
+                'build of the SDK, e.g. `npm install --save-dev @airtable/blocks@interface-alpha`.',
+        );
+    }
+
+    // e.g. <root>/dist/esm/interface/ui/ui.js -> <root>
+    for (let dir = path.dirname(entryPath); ; ) {
+        if (fs.existsSync(path.join(dir, 'package.json'))) {
+            return dir;
+        }
+        const parent = path.dirname(dir);
+        /* istanbul ignore next -- only reachable if the install is corrupt */
+        if (parent === dir) {
+            throw spawnError(
+                'Could not locate the @airtable/blocks package directory from %s.',
+                entryPath,
+            );
+        }
+        dir = parent;
+    }
 }
+
+const sdkRoot = resolveSdkRoot();
 
 function loadSdkModule(relativePath: string): any {
     const absolutePath = path.join(sdkRoot, relativePath);
@@ -62,7 +96,7 @@ function loadSdkModule(relativePath: string): any {
         throw spawnError(
             'Failed to load %s from the installed @airtable/blocks package (%s). ' +
                 'This testing library requires the interface-alpha build of the SDK ' +
-                '(`npm install --save-dev @airtable/blocks@interface-alpha-next`). ' +
+                '(`npm install --save-dev @airtable/blocks@interface-alpha`). ' +
                 'Original error: %s',
             relativePath,
             sdkRoot,

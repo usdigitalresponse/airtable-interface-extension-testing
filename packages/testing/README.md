@@ -27,7 +27,7 @@ The [example extension's test suite](../../examples/todo-list/test/app.test.tsx)
 This package isn't published to npm. Install the tarball from a [GitHub Release](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases):
 
 ```bash
-npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.1.0/usdr-airtable-interface-testing-0.1.0.tgz @airtable/blocks@interface-alpha-next
+npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.1.0/usdr-airtable-interface-testing-0.1.0.tgz @airtable/blocks@interface-alpha
 ```
 
 **Finding the URL ---** on the [releases page](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases), open a release and copy the link to `usdr-airtable-interface-testing-<version>.tgz` under **Assets**. Every release follows the same URL shape, so bumping the version in the command above works too:
@@ -38,7 +38,9 @@ https://github.com/usdigitalresponse/airtable-interface-extension-testing/releas
 
 The toolchain — **Jest**, jsdom, babel, and **Testing Library** — ships as this package's dependencies, so that one install is enough. **React 19** and `react-dom` are peer dependencies your extension project already has.
 
-This library was validated against `@airtable/blocks@0.0.0-experimental-dc9f9a979-20260605` (the `interface-alpha-next` dist-tag as of July 2026). It reaches into the SDK's `dist/` for a few modules the package doesn't export publicly, so a new SDK build can break it — if that happens you'll get a descriptive error at import time rather than silent misbehavior.
+This library is developed and tested against the `interface-alpha` dist-tag — the same build [Airtable's extension templates](https://github.com/Airtable/interface-extensions-hello-world-typescript) install — currently `0.0.0-experimental-8575f0e0d-20260428`. The suite also passes against `interface-alpha-next` (`0.0.0-experimental-dc9f9a979-20260605`), so either works.
+
+It reaches into the SDK's `dist/` for a few modules the package doesn't export publicly, so a new SDK build can break it — if that happens you'll get a descriptive error at import time rather than silent misbehavior.
 
 ## Jest configuration
 
@@ -182,7 +184,7 @@ Record and globalConfig testing carry over almost unchanged — you drive writes
 
 **"attempted to communicate with the host application outside of a simulated environment" ---** your extension rendered (or called SDK functions) outside `testDriver.Container`. Wrap the render, and access state through the driver.
 
-**`ERR_PACKAGE_PATH_NOT_EXPORTED` or missing-module errors mentioning `dist/esm` ---** the installed `@airtable/blocks` isn't an interface-alpha build. Install `@airtable/blocks@interface-alpha-next`.
+**`ERR_PACKAGE_PATH_NOT_EXPORTED` or missing-module errors mentioning `dist/esm` ---** the installed `@airtable/blocks` isn't an interface-alpha build. Install `@airtable/blocks@interface-alpha`.
 
 **`SyntaxError: Cannot use import statement outside a module` pointing into `@airtable/blocks` ---** Jest isn't transforming the SDK; check `transformIgnorePatterns`.
 

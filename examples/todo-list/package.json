@@ -9,7 +9,7 @@
         "types": "tsc"
     },
     "dependencies": {
-        "@airtable/blocks": "interface-alpha-next",
+        "@airtable/blocks": "interface-alpha",
         "react": "^19.1.0",
         "react-dom": "^19.1.0"
     },

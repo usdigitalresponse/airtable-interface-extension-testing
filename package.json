@@ -1,7 +1,7 @@
 {
   "name": "airtable-interface-extension-testing",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Testing library and fixture tooling for Airtable interface extensions (interface-alpha Blocks SDK)",
   "type": "module",
   "workspaces": [

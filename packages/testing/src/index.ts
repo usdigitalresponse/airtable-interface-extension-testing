@@ -19,7 +19,7 @@ for (const relativePath of Object.values(sdkInternalPaths)) {
         throw spawnError(
             'The installed @airtable/blocks package (%s) is missing %s. This ' +
                 'testing library supports the interface-alpha builds of the SDK ' +
-                '(`npm install --save-dev @airtable/blocks@interface-alpha-next`).',
+                '(`npm install --save-dev @airtable/blocks@interface-alpha`).',
             sdkPackageRoot,
             relativePath,
         );
