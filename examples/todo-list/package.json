@@ -1,7 +1,7 @@
 {
     "name": "@usdr/example-todo-list",
     "private": true,
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Example Airtable interface extension with an automated test suite using @usdr/airtable-interface-testing",
     "type": "module",
     "scripts": {

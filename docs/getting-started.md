@@ -13,7 +13,7 @@ For a live example, check out the [Example extension](../examples/todo-list).
 This package isn't on npm yet — we publish tarballs on [GitHub Releases](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases) instead. After setting up your Airtable project, install the latest release:
 
 ```bash
-npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.1.0/usdr-airtable-interface-testing-0.1.0.tgz
+npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.2.0/usdr-airtable-interface-testing-0.2.0.tgz
 ```
 
 **Finding the URL ---** open the [releases page](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases), pick a release, and look under **Assets**. Copy the link address of `usdr-airtable-interface-testing-<version>.tgz` — that's the URL you pass to `npm install`. The URLs always follow the same pattern, so you can also just edit the version in the command above:

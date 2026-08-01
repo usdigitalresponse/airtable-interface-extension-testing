@@ -27,7 +27,7 @@ The [example extension's test suite](../../examples/todo-list/test/app.test.tsx)
 This package isn't published to npm. Install the tarball from a [GitHub Release](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases):
 
 ```bash
-npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.1.0/usdr-airtable-interface-testing-0.1.0.tgz @airtable/blocks@interface-alpha
+npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.2.0/usdr-airtable-interface-testing-0.2.0.tgz @airtable/blocks@interface-alpha
 ```
 
 **Finding the URL ---** on the [releases page](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases), open a release and copy the link to `usdr-airtable-interface-testing-<version>.tgz` under **Assets**. Every release follows the same URL shape, so bumping the version in the command above works too:
