@@ -1,66 +1,66 @@
 {
-    "name": "@usdr/airtable-interface-testing",
-    "version": "0.1.0",
-    "description": "Automated testing library for Airtable interface extensions (interface-alpha Blocks SDK)",
-    "type": "module",
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "import": "./dist/index.js",
-            "require": "./dist/index.cjs"
-        },
-        "./inject": {
-            "types": "./dist/inject.d.ts",
-            "import": "./dist/inject.js",
-            "require": "./dist/inject.cjs"
-        },
-        "./jest-preset": "./jest-preset.cjs"
+  "name": "@usdr/airtable-interface-testing",
+  "version": "0.2.0",
+  "description": "Automated testing library for Airtable interface extensions (interface-alpha Blocks SDK)",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
-    "sideEffects": true,
-    "files": [
-        "dist",
-        "jest-preset.cjs",
-        "setup_after_env.cjs"
-    ],
-    "scripts": {
-        "build": "tsup",
-        "types": "tsc",
-        "test": "jest"
+    "./inject": {
+      "types": "./dist/inject.d.ts",
+      "import": "./dist/inject.js",
+      "require": "./dist/inject.cjs"
     },
-    "peerDependencies": {
-        "@airtable/blocks": "*",
-        "react": "^19.0.0",
-        "react-dom": "^19.0.0"
-    },
-    "dependencies": {
-        "@babel/core": "^7.26.0",
-        "@babel/preset-env": "^7.26.0",
-        "@babel/preset-react": "^7.26.0",
-        "@babel/preset-typescript": "^7.26.0",
-        "@testing-library/dom": "^10.4.0",
-        "@testing-library/jest-dom": "^6.6.0",
-        "@testing-library/react": "^16.3.0",
-        "@testing-library/user-event": "^14.5.0",
-        "babel-jest": "^29.7.0",
-        "jest": "^29.7.0",
-        "jest-environment-jsdom": "^29.7.0"
-    },
-    "devDependencies": {
-        "@airtable/blocks": "interface-alpha",
-        "@types/jest": "^29.5.14",
-        "@types/node": "^22.0.0",
-        "@types/react": "^19.1.0",
-        "@types/react-dom": "^19.1.0",
-        "babel-plugin-transform-import-meta": "^2.3.2",
-        "react": "^19.1.0",
-        "react-dom": "^19.1.0",
-        "tsup": "^8.3.0",
-        "typescript": "^5.6.0"
-    },
-    "engines": {
-        "node": ">=20.19"
-    }
+    "./jest-preset": "./jest-preset.cjs"
+  },
+  "sideEffects": true,
+  "files": [
+    "dist",
+    "jest-preset.cjs",
+    "setup_after_env.cjs"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "types": "tsc",
+    "test": "jest"
+  },
+  "peerDependencies": {
+    "@airtable/blocks": "*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.26.0",
+    "@babel/preset-typescript": "^7.26.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.5.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "devDependencies": {
+    "@airtable/blocks": "interface-alpha",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "babel-plugin-transform-import-meta": "^2.3.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20.19"
+  }
 }
