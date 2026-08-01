@@ -34,6 +34,10 @@ jobs:
       # Installs from the committed lockfile, so CI matches local installs.
       - run: npm ci
 
+      # Every package.json must declare the same version — releases are tagged
+      # from it, and a mismatch fails the release halfway through.
+      - run: npm run check:versions
+
       - run: npm run lint
 
       # Must precede the tests: the examples workspace resolves the testing

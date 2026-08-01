@@ -35,6 +35,7 @@ npm workspaces monorepo:
 - `npm run build` — tsup builds both packages **in dependency order**, which the root script spells out explicitly (`-w testing && -w fixture-generator`). Don't switch it back to `--workspaces`: npm runs workspaces in listed/glob order, not topological order, and the fixture generator's declaration build imports `FixtureData` from the testing package's built `dist/index.d.ts`. Building out of order fails with `TS2307: Cannot find module '@usdr/airtable-interface-testing'` — only on clean checkouts (CI), since a stale local `dist/` hides it. Build before running the testing package's dist smoke test or the CLI.
 - `npm test` — every workspace's Jest suite. All suites must pass before committing.
 - `npm run pack:release` — builds, then packs both tarballs into `release/` (gitignored). Always pack through this script: `npm pack` alone ships whatever stale `dist/` happens to be on disk.
+- `npm run check:versions` — asserts every `package.json` (root, both packages, the example) declares the same version. Runs in CI before lint and again in the release workflow; a drift here is what breaks a release mid-flight. Bump with `npm version <v> --workspaces --include-workspace-root --no-git-tag-version` (it refuses when some packages already match — bump those with `-w <name>`).
 - `npm run lint` — ESLint over all TypeScript sources (flat config in `eslint.config.mjs`; `.js`/`.cjs`/`.mjs` tool configs and generated `fixtures/` are ignored).
 - **Build before test.** `npm test` requires a prior `npm run build`: the examples workspace resolves the testing package's Jest preset out of `dist/`, and the dist smoke test needs the built artifact. CI (`.github/workflows/ci.yml`) runs lint → build → test in that order on every PR and on pushes to `main`, across Node 20.19 and 22.
 - `npx tsc` inside a workspace — type check (no emit).
@@ -65,6 +66,8 @@ npm workspaces monorepo:
 Security rules adapted from [TikiTribe/claude-secure-coding-rules](https://github.com/TikiTribe/claude-secure-coding-rules) live in [.claude/rules/security.md](.claude/rules/security.md). Read and follow them when writing or reviewing code in this repo. Style: 4-space indent, single quotes, ES modules, TypeScript strict; prose in Kevin's voice per the user-level CLAUDE.md.
 
 ## Work log
+
+- **2026-08-01** — All four `package.json` files bumped to 0.2.0 and kept in lockstep from now on: `scripts/check-versions.mjs` (root script `check:versions`) fails when any two disagree, wired into ci.yml before lint and release.yml before the tag guard. A `testing` 0.2.0 / `fixture-generator` 0.1.0 split is what broke the first release. Release-URL examples in all four docs moved to v0.2.0; the earlier "root stays at 0.0.0" guidance is retired.
 
 - **2026-07-23** — Switched the pinned SDK from `interface-alpha-next` to `interface-alpha` (what Airtable's templates install). Required a real fix: `interface-alpha` doesn't export `./package.json`, so `sdk_internals.ts` gained `resolveSdkRoot()` with an entry-point fallback. Full suite verified green against both dist-tags.
 

@@ -16,7 +16,7 @@ You get a `TestDriver` with the same shape as the v1 library — fixture data in
 These packages aren't on npm yet — we attach tarballs to [GitHub Releases](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases) instead. Open the latest release, copy the link to the `.tgz` you want under **Assets**, and hand it to npm:
 
 ```bash
-npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.1.0/usdr-airtable-interface-testing-0.1.0.tgz
+npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.2.0/usdr-airtable-interface-testing-0.2.0.tgz
 ```
 
 Release assets always follow the same shape, so you can bump the version in that URL directly:
@@ -61,13 +61,15 @@ A husky pre-commit hook runs `npm run lint` and the test suite before each commi
 Releasing is a side effect of merging. Bump the `version` in both `packages/*/package.json` as part of your PR, and when it merges to `main` the [tag-on-merge workflow](.github/workflows/tag-on-merge.yml) tags the merge commit with that version and kicks off the release. Merges that don't touch the version do nothing — the tag already exists, so the workflow stops there.
 
 ```bash
-npm version 0.2.0 -w @usdr/airtable-interface-testing -w @usdr/airtable-interface-testing-fixtures --no-git-tag-version
+npm version 0.3.0 --workspaces --include-workspace-root --no-git-tag-version
 ```
 
-That bumps both released packages — and leaves the private example alone — so you can commit the change in your PR and merge.
+**Every `package.json` in the repo must carry the same version** — the root, both packages, and the example. CI fails the build if they drift, because a mismatch is what breaks a release halfway through. Run `npm run check:versions` locally to check.
+
+If some packages are already at the target version, `npm version` refuses to run ("Version not changed"); bump the stragglers individually with `-w <package-name>`.
 
 The [release workflow](.github/workflows/release.yml) then verifies the tag matches both package versions, runs lint, build, and the full test suite, packs both tarballs, and publishes a GitHub Release with generated notes and the tarballs attached. If anything fails, nothing is published.
 
-**Note:** the version in `packages/testing/package.json` is what drives the tag. The root `package.json` is private, stays at `0.0.0`, and is never released.
+**Note:** the version in `packages/testing/package.json` is what drives the tag. The root and example packages are private and never published, but they carry the same version so the check above can enforce one number across the repo.
 
 You can still release by hand — push a `v*` tag yourself, or run the release workflow from the Actions tab against an existing tag. To build the tarballs locally without releasing, run `npm run pack:release` and look in `release/`.

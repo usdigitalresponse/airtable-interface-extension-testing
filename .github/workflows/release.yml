@@ -49,7 +49,10 @@ jobs:
 
       - run: npm ci
 
-      # Guard: the tag must match the version both packages declare, so the
+      # Guard 1: every package.json agrees with every other one.
+      - run: npm run check:versions
+
+      # Guard 2: the tag must match the version both packages declare, so the
       # release name can never disagree with the tarballs attached to it.
       - name: Check package versions match the tag
         run: |
