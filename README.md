@@ -42,6 +42,8 @@ npm writes the URL into your lockfile, so installs stay reproducible. [Getting s
 
 **[examples/todo-list](examples/todo-list) ---** a small interface extension with a complete test suite. If you want to see the library in use before reading docs, read [its test file](examples/todo-list/test/app.test.tsx).
 
+**[examples/field-types](examples/field-types) ---** a workbench extension covering every `FieldType`, with a data-driven smoke suite asserting each type's documented cell read and write formats. The reference for "what does this field type's cell value look like?"
+
 ## Quick start for working in this project
 
 If you want to work on the actual testing repo itself:

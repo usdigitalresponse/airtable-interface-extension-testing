@@ -138,7 +138,7 @@ export interface PageElementInQueryContainerBlockRunContext {
     isPageElementInEditMode: boolean;
 }
 
-/** Mirrors interface/types/airtable_interface.ts (SdkInitData) */
+/** Mirrors interface/types/airtable_interface.ts (SdkInitData) + shared/types/airtable_interface_core.ts (SdkInitDataCore) */
 export interface SdkInitData {
     isDevelopmentMode: boolean;
     blockInstallationId: BlockInstallationId;
@@ -148,6 +148,13 @@ export interface SdkInitData {
     runContext: PageElementInQueryContainerBlockRunContext;
     baseData: BaseData;
     intentData: unknown;
+    /**
+     * When true, multipleLookupValues cell values use the SDK's documented
+     * public read format (`Array<{linkedRecordId, value}>`); when absent, the
+     * SDK expects hyperbase's internal `{linkedRecordIds,
+     * valuesByLinkedRecordId}` shape and throws on anything else.
+     */
+    isUsingNewLookupCellValueFormat?: true;
 }
 
 /** Mirrors shared/types/base_core.ts (ModelChange) */

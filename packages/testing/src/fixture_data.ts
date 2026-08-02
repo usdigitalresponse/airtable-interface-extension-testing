@@ -203,6 +203,9 @@ export function convertFixtureDataToSdkInitData(fixtureData: FixtureData): SdkIn
         isDevelopmentMode: false,
         blockInstallationId: DEFAULT_BLOCK_INSTALLATION_ID,
         isFirstRun: false,
+        // Fixtures declare multipleLookupValues cell values in the SDK's
+        // documented public read format: Array<{linkedRecordId, value}>.
+        isUsingNewLookupCellValueFormat: true,
         initialKvValuesByKey: fixtureData.globalConfig ?? {},
         initialSearchParams: fixtureData.searchParams ?? {},
         runContext: {
