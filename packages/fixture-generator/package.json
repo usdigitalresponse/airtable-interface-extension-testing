@@ -1,6 +1,6 @@
 {
     "name": "@usdr/airtable-interface-testing-fixtures",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Generate test fixture data for Airtable interface extensions from a real base via the Airtable REST API",
     "type": "module",
     "bin": {

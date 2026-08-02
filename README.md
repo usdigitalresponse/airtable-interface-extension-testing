@@ -16,7 +16,7 @@ You get a `TestDriver` with the same shape as the v1 library — fixture data in
 These packages aren't on npm yet — we attach tarballs to [GitHub Releases](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases) instead. Open the latest release, copy the link to the `.tgz` you want under **Assets**, and hand it to npm:
 
 ```bash
-npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.2.0/usdr-airtable-interface-testing-0.2.0.tgz
+npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.3.0/usdr-airtable-interface-testing-0.3.0.tgz
 ```
 
 Release assets always follow the same shape, so you can bump the version in that URL directly:
