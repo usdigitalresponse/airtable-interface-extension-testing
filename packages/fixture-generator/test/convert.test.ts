@@ -193,6 +193,46 @@ describe('buildFixtureData', () => {
         ]);
     });
 
+    it('warns that lookup values keep the REST flat-array shape', () => {
+        const exports = makeExports();
+        exports[0] = {
+            ...exports[0],
+            schema: {
+                ...TASKS_SCHEMA,
+                fields: [
+                    ...TASKS_SCHEMA.fields,
+                    {
+                        id: 'fldLookup00000000',
+                        name: 'Project names',
+                        type: 'multipleLookupValues',
+                        options: {recordLinkFieldId: 'fldProject0000000'},
+                    },
+                ],
+            },
+            fieldIds: [...exports[0].fieldIds, 'fldLookup00000000'],
+            records: [
+                {
+                    ...exports[0].records[0],
+                    fields: {
+                        ...exports[0].records[0].fields,
+                        fldLookup00000000: ['Fixture generator'],
+                    },
+                },
+            ],
+        };
+        const {fixtureData, warnings} = buildFixtureData(
+            {id: 'appExample0000000', name: 'Example'},
+            exports,
+        );
+
+        // Passed through unchanged; the documented SDK read format needs
+        // linkedRecordId, which the REST payload does not carry.
+        expect(fixtureData.base.tables[0].records[0].cellValuesByFieldId.fldLookup00000000).toEqual(
+            ['Fixture generator'],
+        );
+        expect(warnings.some((warning) => warning.includes('flat-array shape'))).toBe(true);
+    });
+
     it('requires the primary field to be exported', () => {
         const exports = makeExports();
         exports[0] = {...exports[0], fieldIds: ['fldCount000000000']};

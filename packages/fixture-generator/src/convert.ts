@@ -102,6 +102,17 @@ export function buildFixtureData(
                     return choice;
                 });
             }
+            case 'multipleLookupValues': {
+                // The REST API flattens lookups to a plain array of values,
+                // losing which linked record each value came from — so the
+                // SDK's documented read format (Array<{linkedRecordId,
+                // value}>) cannot be reconstructed here.
+                warnOnce(
+                    `lookup:${field.id}`,
+                    `${tableName}.${field.name}: lookup values export in the REST API's flat-array shape; the SDK documents Array<{linkedRecordId, value}> — hand-edit the fixture if your extension reads linkedRecordId`,
+                );
+                return value;
+            }
             case 'multipleRecordLinks': {
                 if (!Array.isArray(value)) {
                     return value;

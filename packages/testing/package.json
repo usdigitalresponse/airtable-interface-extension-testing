@@ -1,6 +1,6 @@
 {
   "name": "@usdr/airtable-interface-testing",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Automated testing library for Airtable interface extensions (interface-alpha Blocks SDK)",
   "type": "module",
   "main": "./dist/index.cjs",

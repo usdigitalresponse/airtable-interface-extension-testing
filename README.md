@@ -16,7 +16,7 @@ You get a `TestDriver` with the same shape as the v1 library — fixture data in
 These packages aren't on npm yet — we attach tarballs to [GitHub Releases](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases) instead. Open the latest release, copy the link to the `.tgz` you want under **Assets**, and hand it to npm:
 
 ```bash
-npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.2.0/usdr-airtable-interface-testing-0.2.0.tgz
+npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.3.0/usdr-airtable-interface-testing-0.3.0.tgz
 ```
 
 Release assets always follow the same shape, so you can bump the version in that URL directly:
@@ -41,6 +41,8 @@ npm writes the URL into your lockfile, so installs stay reproducible. [Getting s
 **[packages/fixture-generator](packages/fixture-generator) ---** `@usdr/airtable-interface-testing-fixtures`, a CLI that exports schema and records from a real base into fixture files, replacing the v1 "Test Fixtures Generator" extension.
 
 **[examples/todo-list](examples/todo-list) ---** a small interface extension with a complete test suite. If you want to see the library in use before reading docs, read [its test file](examples/todo-list/test/app.test.tsx).
+
+**[examples/field-types](examples/field-types) ---** a workbench extension covering every `FieldType`, with a data-driven smoke suite asserting each type's documented cell read and write formats. The reference for "what does this field type's cell value look like?"
 
 ## Quick start for working in this project
 

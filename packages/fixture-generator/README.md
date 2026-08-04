@@ -7,7 +7,7 @@ Generate [`FixtureData`](../testing/README.md#writing-fixture-data) for interfac
 Inside this repo the CLI is already linked, so `npx airtable-testing-fixtures` works from the repo root. From another project, install the tarball attached to a [GitHub Release](https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases) — copy the link to `usdr-airtable-interface-testing-fixtures-<version>.tgz` under **Assets**:
 
 ```bash
-npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.2.0/usdr-airtable-interface-testing-fixtures-0.2.0.tgz
+npm install --save-dev https://github.com/usdigitalresponse/airtable-interface-extension-testing/releases/download/v0.3.0/usdr-airtable-interface-testing-fixtures-0.3.0.tgz
 ```
 
 ## Usage

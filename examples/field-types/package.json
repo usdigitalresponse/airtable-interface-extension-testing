@@ -1,8 +1,8 @@
 {
-    "name": "@usdr/example-todo-list",
+    "name": "@usdr/example-field-types",
     "private": true,
     "version": "0.3.0",
-    "description": "Example Airtable interface extension with an automated test suite using @usdr/airtable-interface-testing",
+    "description": "Example Airtable interface extension covering every FieldType, used as a smoke test for all cell value formats",
     "type": "module",
     "scripts": {
         "test": "jest",
